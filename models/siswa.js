@@ -1,6 +1,7 @@
 /* jshint indent: 2 */
 
 const { Sequelize, DataTypes } = require("sequelize");
+const kelas = require("./kelas");
 
 /**
  * 
@@ -8,8 +9,8 @@ const { Sequelize, DataTypes } = require("sequelize");
  * @param {DataTypes} DataTypes 
  * 
  */
-module.exports = function(sequelize) {
-  return sequelize.define('siswa', {
+module.exports = function(sequelize,DataTypes) {
+  const siswa = sequelize.define('siswa', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -41,8 +42,21 @@ module.exports = function(sequelize) {
       allowNull: true
     }
   }, {
-    timestamps: false,
     sequelize,
+    timestamps: false,
+    freezeTableName: true,
     tableName: 'siswa'
   });
+
+  const User = require('./user')(sequelize);
+  siswa.belongsTo(User,{
+    foreignKey: 'id'
+  });
+
+  const Kelas = require('./kelas')(sequelize);
+  siswa.belongsTo(Kelas, {
+    foreignKey: 'id_kelas'
+  });
+
+  return siswa;
 };

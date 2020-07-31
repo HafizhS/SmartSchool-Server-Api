@@ -1,7 +1,15 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('kelas', {
+const { Sequelize, DataTypes } = require("sequelize");
+
+/**
+ * 
+ * @param {Sequelize} sequelize 
+ * @param {DataTypes} DataTypes 
+ * 
+ */
+module.exports = function(sequelize) {
+  const kelas = sequelize.define('kelas', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -34,6 +42,24 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
-    tableName: 'kelas'
+    freezeTableName: true,
+    timestamps: false,
+    tableName: 'kelas',
+    name: {
+      plural: "kelas",
+      singular: "kelas"
+    }
   });
+
+  const Walikelas = require('./kelas_walikelas')(sequelize);
+  kelas.belongsTo(Walikelas,{
+    foreignKey: "id_kelas_walikelas"
+  });
+
+  // const Guru = require('./guru')(sequelize);
+  // kelas.belongsTo(Guru,{
+  //   foreignKey: "id_kelas_walikelas"
+  // })
+
+  return kelas;
 };

@@ -1,47 +1,66 @@
 const express = require('express');
-const jwt = require('jsonwebtoken');
-const middleware = require('../middlewares');
 const db = require('../config/database');
+const middleware = require('../middlewares');
+const jwt = require('jsonwebtoken');
 const route = express.Router();
 
 const accessSecret = require('../functions.js').getAccessTokenSecret();
 const refreshSecret = require('../functions.js').getRefreshTokenSecret();
 
-const Users = require('../models/user')(db);
-const Role = require('../models/role')(db);
+const AuthData = require('../models/auth/authData');
 
 
-route.get('/login', async function (req, res) {
+route.get('/test', function(req,res) {
+    return res.send("test !!!");
+})
+
+route.post('/login', async function (req, res) {
     var email = req.body.email;
     var password = req.body.password;
 
+    if (!email || !password) {
+        return res.status(400).send({
+            success: false,
+            message: 'email or password cannot empty!'
+        });
+    }
+
     try {
-        var user = await Users.findOne({
+        var user = await db.model.User.findOne({
             where: {email: email,password: password},
             attributes: ['id','email'],
             include: [{
-                model: Role,
+                model: db.model.Role,
                 attributes: ['role']
             }]
         });
 
+        
         if(!user || user.length === 0) {
-            return res.status(400).send({
+            return res.status(403).send({
                 success: false,
                 message: 'wrong email or password!'
             });
         }
 
-        var accessToken = generateAccessToken(user.toJSON());
-        var refreshToken = generateRefreshToken(user.toJSON());
+        var userDetail = await db.model.UserDetails.findOne({
+            where: {id: user.id}
+        });
+        
 
-        return res.send({
+        var authData = new AuthData(user.id,user.email,userDetail.nickname,user.role.role);
+        console.log(authData);
+        var accessToken = generateAccessToken(authData);
+        var refreshToken = generateRefreshToken(authData);
+
+        return res.status(200).send({
             success: true,
             access_token: accessToken,
             refresh_token: refreshToken
         });
 
     }catch (error) {
+        console.log(error);
         return res.status(400).send({
             success: false,
             error_message: error
@@ -61,17 +80,40 @@ function generateRefreshToken(user) {
 
 
 route.get('/verify', middleware.authenticateToken, function(req,res) {
-    return res.json(req.user);
+    return res.send(req.user);
+});  
+
+route.get('/token',middleware.authenticateToken, function(req,res) {
+
 });
 
-route.post('/register',function (req,res) {
-
+route.post('/register', async function (req,res) {
+    if (req.body.email === undefined || req.body.password === undefined) {
+        return res.send({
+            success: false,
+            message: "Email or Passwrod cannot empty!"
+        });
+    }
+    var email = req.body.email;
+    var password = req.body.password;
+    var idRole = 3;
+    var user = db.model.User.create({
+        email: email,
+        password: password,
+        id_role: idRole
+    });
+    if (user) {
+        return res.send({
+            success: true,
+            message: "success create user!"
+        });
+    }
 });
 
 route.get('/user', async function(req,res) {
-    return res.send(await Users.findAll({
+    return res.send(await db.model.User.findAll({
         include: [{
-            model: Role
+            model: db.model.Role
         }]
     }));
 });

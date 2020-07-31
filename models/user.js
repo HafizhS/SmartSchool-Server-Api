@@ -5,7 +5,7 @@ const { Sequelize, DataTypes } = require("sequelize");
 /**
  * 
  * @param {Sequelize} sequelize 
- * @param {DataTypes} DataTypes 
+ * @param {DataTypes} dataTypes 
  * 
  */
 module.exports = function(sequelize) {
@@ -33,14 +33,21 @@ module.exports = function(sequelize) {
           tableName: 'role',
         },
         key: 'id'
-      }
+      },
+      defaultValue: 3
     }
   }, {
-    timestamps: false,
     sequelize,
-    tableName: 'user'
+    timestamps: false,
+    freezeTableName: true,
+    tableName: 'user',
+    name: {
+      plural: "user",
+      singular: "user"
+    }
   });
 
+  
   const Role = require('./role')(sequelize);
   user.belongsTo(Role,{
     foreignKey: 'id_role'

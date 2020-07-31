@@ -34,6 +34,7 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
+    freezeTableName: true,
     tableName: 'siswa_tugas'
   });
 };

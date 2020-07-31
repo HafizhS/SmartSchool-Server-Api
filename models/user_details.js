@@ -1,16 +1,21 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('user_details', {
+const { Sequelize, DataTypes } = require("sequelize");
+
+/**
+ * 
+ * @param {Sequelize} sequelize 
+ * @param {DataTypes} DataTypes 
+ * 
+ */
+module.exports = function(sequelize,DataTypes) {
+
+  const userDetail = sequelize.define('user_details', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
-      primaryKey: true
-    },
-    id_user: {
-      type: DataTypes.INTEGER,
-      allowNull: true,
+      primaryKey: true,
       references: {
         model: {
           tableName: 'user',
@@ -28,6 +33,14 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
+    timestamps: false,
     tableName: 'user_details'
   });
+
+  const Users = require('./user')(sequelize);
+  userDetail.belongsTo(Users,{
+    foreignKey: 'id'
+  });
+
+  return userDetail;
 };
