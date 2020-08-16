@@ -1,12 +1,23 @@
 /* jshint indent: 2 */
+const { Sequelize, DataTypes } = require("sequelize");
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('tugas', {
+/**
+ * 
+ * @param {Sequelize} sequelize 
+ * @param {DataTypes} DataTypes 
+ * 
+ */
+module.exports = function(sequelize) {
+  const tugas = sequelize.define('tugas', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
       allowNull: false,
       primaryKey: true
+    },
+    tugas: {
+      type: DataTypes.TEXT,
+      allowNull: true
     },
     id_guru: {
       type: DataTypes.INTEGER,
@@ -28,12 +39,24 @@ module.exports = function(sequelize, DataTypes) {
         key: 'id'
       }
     },
-    tanggal_dibuat: {
-      type: DataTypes.DATE,
-      allowNull: true
-    }
+    // created_at: {
+    //   type: DataTypes.DATE,
+    //   allowNull: true
+    // },
+    // updated_at: {
+    //   type: DataTypes.DATE,
+    //   allowNull: true
+    // }
   }, {
     sequelize,
-    tableName: 'tugas'
+    tableName: 'tugas',
+    underscored: true,
+    timestamps: true,
+    name: {
+      plural: "kelas",
+      singular: "kelas"
+    }
   });
+
+  return tugas;
 };

@@ -8,6 +8,7 @@ app.listen(3000, async function () {
     console.log("Server started");
     try {
         await db.sequelize.authenticate();
+        
         // await db.initModel;
         // console.log(await db.model.Guru.findOne());
         console.log('Connection has been established successfully.');
@@ -21,12 +22,14 @@ app.listen(3000, async function () {
 var auth = require('./route/auth');
 var siswa = require('./route/siswa');
 var kelas = require('./route/kelas');
+var tugas = require('./route/tugas');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use('/', auth);
 app.use('/', siswa);
 app.use('/', kelas);
+app.use('/', tugas);
 
 
 module.exports = app;

@@ -47,4 +47,31 @@ route.get('/kelas/:kelas/walikelas', middleware.authenticateToken, async functio
     return res.send(siswaWaliKelas).status(200);
 });
 
+route.post('/kelas/:kelas/tugas/:tugas(\\d+)/add', middleware.authenticateToken, async function (req, res) {
+    var kelas = req.params.kelas;
+    var idTugas = req.params.tugas;
+
+    var kelas = await db.models.Kelas.findOne({
+        where: {
+            kelas: kelas
+        }
+    });
+
+    if (!kelas) {
+        return res.sendStatus(400);
+    }
+
+    db.models.KelasTugas.create({
+       id_kelas: kelas.id,
+       id_tugas: idTugas
+    }).then(data => {
+        console.log(data);
+        return res.status(201).send(data);
+    }).catch(err => {
+        console.error(err);
+        return res.sendStatus(400);
+    });
+
+});
+
 module.exports = route;

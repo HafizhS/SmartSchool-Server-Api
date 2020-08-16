@@ -1,10 +1,19 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('siswa_tugas', {
+const { Sequelize, DataTypes, NOW } = require("sequelize");
+
+/**
+ * 
+ * @param {Sequelize} sequelize 
+ * @param {DataTypes} DataTypes 
+ * 
+ */
+module.exports = function(sequelize,DataTypes) {
+  const siswaTugas = sequelize.define('siswa_tugas', {
     id_user: {
       type: DataTypes.INTEGER,
       allowNull: true,
+      primaryKey: true,
       references: {
         model: {
           tableName: 'siswa',
@@ -31,10 +40,28 @@ module.exports = function(sequelize, DataTypes) {
         },
         key: 'id'
       }
+    },
+    submited_at: {
+      type: DataTypes.DATE,
+      allowNull: true
     }
   }, {
     sequelize,
-    freezeTableName: true,
-    tableName: 'siswa_tugas'
+    tableName: 'siswa_tugas',
+    timestamps: true,
+    underscored: true,
+    name: {
+      plural: "siswa_tugas",
+      singular: "siswa_tugas"
+    }
   });
+
+  var siswa = require('./siswa')(sequelize,DataTypes);
+  var kelasTugas = require('./kelas_tugas')(sequelize,DataTypes);
+  siswaTugas.belongsTo(kelasTugas,{
+    foreignKey: 'id_kelas_tugas'
+  });
+
+
+  return siswaTugas;
 };

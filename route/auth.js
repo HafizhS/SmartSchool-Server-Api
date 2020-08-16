@@ -74,17 +74,34 @@ function generateAccessToken(user) {
 }
 
 function generateRefreshToken(user) {
-    var refreshToken = jwt.sign(user,refreshSecret,{expiresIn: '6d'});
+    var refreshToken = jwt.sign(user,refreshSecret,{expiresIn: '2d'});
     return refreshToken;
 }
 
 
-route.get('/verify', middleware.authenticateToken, function(req,res) {
+route.get('/user', middleware.authenticateToken, function(req,res) {
     return res.send(req.user);
 });  
 
-route.get('/token',middleware.authenticateToken, function(req,res) {
-
+route.post('/token', function(req,res) {
+    var refreshToken = req.body.token;
+    if(!refreshToken) {
+        return res.sendStatus(401);
+    }
+    jwt.verify(refreshToken,refreshSecret,(err,decode) => {
+        if (err) {
+            console.log(err);
+            return res.sendStatus(401);
+        }else {
+            var authData = new AuthData(decode.id,decode.email,decode.nickname,decode.role);
+            console.log(authData);
+            var accessToken = generateAccessToken(authData);
+            return res.send({
+                success: true,
+                access_token: accessToken
+            });
+        }
+    });
 });
 
 route.post('/register', async function (req,res) {
@@ -110,7 +127,7 @@ route.post('/register', async function (req,res) {
     }
 });
 
-route.get('/user', async function(req,res) {
+route.get('/users',middleware.authenticateToken, async function(req,res) {
     return res.send(await db.model.User.findAll({
         include: [{
             model: db.model.Role

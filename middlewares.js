@@ -9,15 +9,18 @@ module.exports = {
         var publicKey = require('./functions').getPublicKey();
         var accessSecret = require('./functions').getAccessTokenSecret();
 
-        if (token === null) {
-            return res.sendStatus(401);
+        if (token !== null) {
+            console.log(token);
+            // return res.sendStatus(401);
         }
 
         jwt.verify(token, accessSecret, (err, decoded) => {
             if (err) {
+                if (err.name == 'TokenExpiredError') {
+                    console.log('Token Expired');
+                }
                 console.log(err);
-                console.log(decoded);
-                return res.sendStatus(403);
+                return res.sendStatus(401);
             }
             var user = new AuthData(decoded.id,decoded.email,decoded.nickname,decoded.role);
             console.log(user);
@@ -25,7 +28,7 @@ module.exports = {
             next();
         });
     },
-    
+
     checkRole: function (req,res,next) {
         if (req.user.role.role === 'guest') {
             return res.send({
@@ -35,10 +38,5 @@ module.exports = {
         }
 
         next();
-    },
-
-    guruOnly: function (req,res,next) {
-
     }
-
 };
