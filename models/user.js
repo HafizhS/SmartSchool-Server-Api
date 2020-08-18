@@ -47,6 +47,10 @@ module.exports = function(sequelize) {
     }
   });
 
+  const UserDetail = require('./user_details')(sequelize);
+  user.belongsTo(UserDetail,{
+    foreignKey: 'id'
+  });
   
   const Role = require('./role')(sequelize);
   user.belongsTo(Role,{

@@ -127,14 +127,6 @@ route.post('/register', async function (req,res) {
     }
 });
 
-route.get('/users',middleware.authenticateToken, async function(req,res) {
-    return res.send(await db.model.User.findAll({
-        include: [{
-            model: db.model.Role
-        }]
-    }));
-});
-
 
 
 module.exports = route;

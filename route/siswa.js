@@ -27,7 +27,7 @@ route.get('/siswa/tugas', middleware.authenticateToken, async function (req, res
 
 
     // var tugasSiswa = await db.models.SiswaTugas.findAll({
-    //     where: {
+    //     where: {n 
     //         id_user: userId
     //     },
     //     include: {

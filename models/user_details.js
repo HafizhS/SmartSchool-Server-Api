@@ -8,8 +8,7 @@ const { Sequelize, DataTypes } = require("sequelize");
  * @param {DataTypes} DataTypes 
  * 
  */
-module.exports = function(sequelize,DataTypes) {
-
+module.exports = function(sequelize) {
   const userDetail = sequelize.define('user_details', {
     id: {
       autoIncrement: true,
@@ -37,10 +36,10 @@ module.exports = function(sequelize,DataTypes) {
     tableName: 'user_details'
   });
 
-  const Users = require('./user')(sequelize);
-  userDetail.belongsTo(Users,{
-    foreignKey: 'id'
-  });
+  // const Users = require('./user')(sequelize);
+  // userDetail.belongsTo(Users,{
+  //   foreignKey: 'id'
+  // });
 
   return userDetail;
 };
