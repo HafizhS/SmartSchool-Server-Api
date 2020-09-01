@@ -10,7 +10,7 @@ const refreshSecret = require('../functions.js').getRefreshTokenSecret();
 const AuthData = require('../models/auth/authData');
 
 
-route.get('/test', function(req,res) {
+route.get('/test',middleware.isUserDirExistOrCreate(100), function(req,res) {
     return res.send("test !!!");
 })
 
@@ -103,6 +103,7 @@ route.post('/token', function(req,res) {
         }
     });
 });
+
 
 route.post('/register', async function (req,res) {
     if (req.body.email === undefined || req.body.password === undefined) {

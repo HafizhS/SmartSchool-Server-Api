@@ -4,7 +4,7 @@ const middleware = require('../middlewares');
 const route = express.Router();
 
 
-route.use(middleware.authenticateToken);
+// route.use(middleware.authenticateToken);
 route.post('/tugas/create', async function(req,res) {
 
     var guru = req.body.guru;

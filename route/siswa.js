@@ -25,19 +25,6 @@ route.get('/siswa/tugas', middleware.authenticateToken, async function (req, res
         return res.sendStatus(400);
     });
 
-
-    // var tugasSiswa = await db.models.SiswaTugas.findAll({
-    //     where: {n 
-    //         id_user: userId
-    //     },
-    //     include: {
-    //         model: db.models.KelasTugas,
-    //         include: {
-    //             model: db.models.Tugas
-    //         }
-    //     }
-    // });
-    // return res.send(tugasSiswa);
 });
 
 route.get('/siswa/:id(\\d+)/tugas', middleware.authenticateToken, function (req, res) {

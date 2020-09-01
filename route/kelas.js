@@ -1,6 +1,7 @@
 const express = require('express');
 const db = require('../config/database');
 const middleware = require('../middlewares');
+const { QueryTypes } = require('sequelize');
 const route = express.Router();
 
 route.get('/kelas', async function (req, res) {
@@ -33,6 +34,30 @@ route.get('/kelas/:kelas/siswa', middleware.authenticateToken, async function (r
     });
 
     return res.send(siswaKelas);
+});
+
+route.get('/kelas/jadwal',function (req,res) {
+
+});
+
+route.get('/kelas/:kelas/jadwal',function (req,res) {
+    var hariQuery = `${req.query.hari == undefined ? "" : `AND h.hari = "${req.query.hari}"`}`;
+    var query = `select h.hari,k.kelas,p.nama_pelajaran,ud.nickname as guru,kjp.waktu_mulai,kjp.waktu_selesai
+                from kelas as k
+                join kelas_jadwal kj on k.id = kj.id_kelas
+                join kelas_jadwal_pelajaran kjp on kj.id = kjp.id_kelas_jadwal
+                join pelajaran p on kjp.id_pelajaran = p.id
+                join guru g on kjp.id_guru = g.id
+                join user_details ud on g.id = ud.id
+                join hari h on kj.id_hari = h.id
+                where k.kelas = "${req.params.kelas}"${hariQuery} order by h.hari desc`;
+    db.sequelize.query(query, {
+        type: QueryTypes.SELECT
+    }).then(data => {
+        return res.status(200).send(data);
+    }).catch(err => {
+        return next(error);
+    });
 });
 
 route.get('/kelas/:kelas/walikelas', middleware.authenticateToken, async function (req, res) {

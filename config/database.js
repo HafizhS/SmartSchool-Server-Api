@@ -53,7 +53,8 @@ db.models = {
     Tugas: require('../models/tugas')(sequelize, DataTypes),
     TugasStatus: require('../models/tugas_status')(sequelize, DataTypes),
     UserDetails: require('../models/user_details')(sequelize, DataTypes),
-    User: require('../models/user')(sequelize, DataTypes)
+    User: require('../models/user')(sequelize, DataTypes),
+    Tutorial: require('../models/tutorial')(sequelize,DataTypes)
 };
 
 db.sequelize = sequelize;

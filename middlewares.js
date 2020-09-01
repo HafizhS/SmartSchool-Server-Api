@@ -29,6 +29,29 @@ module.exports = {
         });
     },
 
+    isDirExistOrCreate(dir) {
+        return function(req,res,next) {
+            var fs = require('fs');
+            var dir = __dirname+'/'+dir;
+            if(!fs.existsSync(dir)) {
+                fs.mkdirSync(dir);
+            }
+            next();
+        };
+    },
+
+    isUserDirExistOrCreate(id) {
+        return function(req,res,next) {
+            var fs = require('fs');
+            var dir = __dirname+'/public/user/'+id;
+            console.log(dir);
+            if(!fs.existsSync(dir)) {
+                fs.mkdirSync(dir);
+            }
+            next();
+        };
+    },
+
     checkRole: function (req,res,next) {
         if (req.user.role.role === 'guest') {
             return res.send({
@@ -38,5 +61,20 @@ module.exports = {
         }
 
         next();
+    },
+    
+    
+    requiredFields: function(fields = []) {
+        return function(req,res,next) {
+            for(var i = 0; i < fields.length; i++) {
+                if(req.body[fields[i]] === undefined) {
+                    isFinished = true;
+                    return res.sendStatus(400);
+                }else if (i + 1 === fields.length){
+                    next();
+                    break;
+                }
+            }
+        };
     }
 };

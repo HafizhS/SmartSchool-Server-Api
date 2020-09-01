@@ -2,12 +2,16 @@ const express = require('express');
 const db = require('../config/database');
 const middleware = require('../middlewares');
 const jwt = require('jsonwebtoken');
+const { QueryTypes } = require('sequelize');
 const route = express.Router();
 
 const accessSecret = require('../functions.js').getAccessTokenSecret();
 const refreshSecret = require('../functions.js').getRefreshTokenSecret();
 
-route.get('/users',middleware.authenticateToken, async function(req,res) {
+
+// route.use(middleware.authenticateToken)
+
+route.get('/users', async function(req,res) {
     return res.send(await db.model.User.findAll({
         include: [{
             model: db.model.Role
@@ -15,7 +19,44 @@ route.get('/users',middleware.authenticateToken, async function(req,res) {
     }));
 });
 
-route.get('/users/detail',middleware.authenticateToken, async function(req,res){
+route.post('/user/profile', function(req,req) {
+
+});
+
+route.get('/user/profile',middleware.authenticateToken,function(req,res,next) {
+    var query = `select u.id, ud.nickname, ud.fullname, ud.avatar_url, r.role
+            from user as u
+            join user_details ud on u.id = ud.id
+            join role r on u.id_role = r.id
+            where u.id = ${req.user.id};`
+    db.sequelize.query(query,{
+        type: QueryTypes.SELECT,
+        nest: true
+    }).then(data => {
+        return res.status(200).send(data[0]);
+    }).catch(error => {
+        return next(error);
+    });
+
+    /*
+    role_detail: {
+        unique_identity: {
+            type: "nis" / "nip"
+            identity: 1010101010
+        }
+    }
+    */
+
+    // TODO
+    // guru:
+    // nip
+
+    // siswa:
+    // nis
+    // kelas
+});
+
+route.get('/users/detail', async function(req,res){
     var query = "select u.email, r.role, ud.nickname, ud.fullname from user_details as ud join user u on ud.id = u.id join role r on u.id_role = r.id;";
     db.models.User.findAll({
         attributes: {
@@ -32,11 +73,6 @@ route.get('/users/detail',middleware.authenticateToken, async function(req,res){
         console.log(err);
         return res.sendStatus(400);
     });
-
-    // db.sequelize.query(query).then(data => {
-    //     return res.send(data);
-    // })
-    
 });
 
 module.exports = route;
