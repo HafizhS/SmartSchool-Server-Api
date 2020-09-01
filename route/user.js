@@ -19,8 +19,35 @@ route.get('/users', async function(req,res) {
     }));
 });
 
-route.post('/user/profile', function(req,req) {
+function clean(obj) {
+    for (var propName in obj) { 
+      if (obj[propName] === null || obj[propName] === undefined) {
+        delete obj[propName];
+      }
+    }
+  }
 
+route.post('/user/profile', middleware.authenticateToken,function(req,res,next) {
+    // optional
+    // nickname
+    // fullname
+    var updatedValue = {
+        nickname: req.body.nickname || undefined,
+        fullname: req.body.fullname || undefined
+    };
+    
+    clean(updatedValue);
+
+    db.models.UserDetails.update(updatedValue,{
+        where: {
+            id: req.user.id
+        },
+        
+    }).then(data => {
+        return res.send(data);
+    }).catch(error => {
+        return next(error);
+    });
 });
 
 route.get('/user/profile',middleware.authenticateToken,function(req,res,next) {
