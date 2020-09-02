@@ -29,6 +29,10 @@ module.exports = function(sequelize) {
     fullname: {
       type: DataTypes.STRING(255),
       allowNull: true
+    },
+    avatar_url: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,
