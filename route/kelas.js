@@ -3,10 +3,59 @@ const db = require('../config/database');
 const middleware = require('../middlewares');
 const { QueryTypes } = require('sequelize');
 const route = express.Router();
+const multer = require('multer');
+const middlewares = require('../middlewares');
+const functions = require('../functions');
 
 route.get('/kelas', async function (req, res) {
     var kelas = await db.model.Kelas.findAll();
     return res.send(kelas);
+});
+
+route.post('/kelas',middlewares.requiredFields(["kelas"]),function(req,res,next) {
+    var insertedValue = {
+        kelas: req.body.kelas,
+        id_kelas_walikelas: req.body.id_walikelas || undefined,
+        id_jurusan: req.body.id_jurusan || undefined
+    };
+    functions.cleanProperty(insertedValue);
+    db.models.Kelas.create(insertedValue).then(data => {
+        return res.status(201).send(data);
+    }).catch(err => {
+        next(err);
+    });
+});
+
+route.delete('/kelas/:id(\\d+)',function (req,res,next) {
+    db.models.Kelas.findByPk(req.params.id).then(data=> {
+        data.destroy().then(result => {
+            return res.status(200).send(result);
+        }).then(err => {
+            next(err);
+        });
+    }).catch(err => {
+        return res.sendStatus(404);
+    });
+});
+
+route.patch('/kelas/:id(\\d+)',function(req,res,next) {
+    var { id } = req.params;
+    var updatedValues = {
+        kelas: req.body.kelas || undefined,
+        id_kelas_walikelas: req.body.id_walikelas || undefined,
+        id_jurusan: req.body.id_jurusan || undefined
+    };
+    functions.cleanProperty(updatedValues);
+
+    db.models.Kelas.update(updatedValues,{
+        where: {
+            id: id
+        }
+    }).then(data => {
+        return res.status(200).send(updatedValues);      
+    }).catch(err => {
+        return res.sendStatus(404);
+    });
 });
 
 route.get('/kelas/:kelas', middleware.authenticateToken, async function (req, res) {

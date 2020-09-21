@@ -67,8 +67,7 @@ module.exports = {
     requiredFields: function(fields = []) {
         return function(req,res,next) {
             for(var i = 0; i < fields.length; i++) {
-                if(req.body[fields[i]] === undefined) {
-                    isFinished = true;
+                if(req.body[fields[i]] === undefined || req.body[fields[i]].length === 0) {
                     return res.sendStatus(400);
                 }else if (i + 1 === fields.length){
                     next();

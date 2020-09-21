@@ -33,6 +33,10 @@ module.exports = function(sequelize) {
     avatar_url: {
       type: DataTypes.STRING,
       allowNull: true
+    },
+    cover_url: {
+      type: DataTypes.STRING,
+      allowNull: true
     }
   }, {
     sequelize,

@@ -10,7 +10,7 @@ const refreshSecret = require('../functions.js').getRefreshTokenSecret();
 const AuthData = require('../models/auth/authData');
 
 
-route.get('/test',middleware.isUserDirExistOrCreate(100), function(req,res) {
+route.get('/test', middleware.isUserDirExistOrCreate(100), function (req, res) {
     return res.send("test !!!");
 })
 
@@ -27,16 +27,19 @@ route.post('/login', async function (req, res) {
 
     try {
         var user = await db.model.User.findOne({
-            where: {email: email,password: password},
-            attributes: ['id','email'],
+            where: {
+                email: email,
+                password: password
+            },
+            attributes: ['id', 'email'],
             include: [{
                 model: db.model.Role,
                 attributes: ['role']
             }]
         });
 
-        
-        if(!user || user.length === 0) {
+
+        if (!user || user.length === 0) {
             return res.status(403).send({
                 success: false,
                 message: 'wrong email or password!'
@@ -44,11 +47,13 @@ route.post('/login', async function (req, res) {
         }
 
         var userDetail = await db.model.UserDetails.findOne({
-            where: {id: user.id}
+            where: {
+                id: user.id
+            }
         });
-        
 
-        var authData = new AuthData(user.id,user.email,userDetail.nickname,user.role.role);
+
+        var authData = new AuthData(user.id, user.email, userDetail.nickname, user.role.role);
         console.log(authData);
         var accessToken = generateAccessToken(authData);
         var refreshToken = generateRefreshToken(authData);
@@ -59,7 +64,7 @@ route.post('/login', async function (req, res) {
             refresh_token: refreshToken
         });
 
-    }catch (error) {
+    } catch (error) {
         console.log(error);
         return res.status(400).send({
             success: false,
@@ -69,31 +74,35 @@ route.post('/login', async function (req, res) {
 });
 
 function generateAccessToken(user) {
-    var accessToken = jwt.sign(user,accessSecret,{expiresIn: '2h'});
+    var accessToken = jwt.sign(user, accessSecret, {
+        expiresIn: '2h'
+    });
     return accessToken;
 }
 
 function generateRefreshToken(user) {
-    var refreshToken = jwt.sign(user,refreshSecret,{expiresIn: '2d'});
+    var refreshToken = jwt.sign(user, refreshSecret, {
+        expiresIn: '6d'
+    });
     return refreshToken;
 }
 
 
-route.get('/user', middleware.authenticateToken, function(req,res) {
+route.get('/user', middleware.authenticateToken, function (req, res) {
     return res.send(req.user);
-});  
+});
 
-route.post('/token', function(req,res) {
+route.post('/token', function (req, res) {
     var refreshToken = req.body.token;
-    if(!refreshToken) {
+    if (!refreshToken) {
         return res.sendStatus(401);
     }
-    jwt.verify(refreshToken,refreshSecret,(err,decode) => {
+    jwt.verify(refreshToken, refreshSecret, (err, decode) => {
         if (err) {
             console.log(err);
             return res.sendStatus(401);
-        }else {
-            var authData = new AuthData(decode.id,decode.email,decode.nickname,decode.role);
+        } else {
+            var authData = new AuthData(decode.id, decode.email, decode.nickname, decode.role);
             console.log(authData);
             var accessToken = generateAccessToken(authData);
             return res.send({
@@ -105,7 +114,7 @@ route.post('/token', function(req,res) {
 });
 
 
-route.post('/register', async function (req,res) {
+route.post('/register', async function (req, res) {
     if (req.body.email === undefined || req.body.password === undefined) {
         return res.send({
             success: false,

@@ -1,7 +1,14 @@
 /* jshint indent: 2 */
+const { Sequelize, DataTypes } = require("sequelize");
 
+/**
+ * 
+ * @param {Sequelize} sequelize 
+ * @param {DataTypes} DataTypes 
+ * 
+ */
 module.exports = function(sequelize, DataTypes) {
-  return sequelize.define('pelajaran', {
+  let pelajaran = sequelize.define('pelajaran', {
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,
@@ -14,6 +21,9 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     sequelize,
+    timestamps: false,
     tableName: 'pelajaran'
   });
+
+  return pelajaran;
 };
